@@ -50,8 +50,6 @@ public class GenericArrayTest {
     testArray.add(2, 2);
     testArray.add(3, 3);
 
-    System.out.println(testArray);
-
     testArray.remove(0);
 
     if (!testArray.toString().equals("[1, 2, 3, null, null]")) passou = false;
