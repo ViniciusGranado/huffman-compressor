@@ -1,11 +1,13 @@
 package shared;
-import java.util.Collections;
-import java.util.PriorityQueue;
 
 public class HuffmanEncoder {
   public CompressResult compress (String data) {
     int[] frequency = getFrequencyArray(data);
-    return null;
+    Node root = geHuffmanTree(frequency);
+    GenericArray<CharCodeMap> charCodeMap = buildCharCodeMap(root);
+
+    CompressResult compressedData = getCompressedData(data, charCodeMap, root);
+    return compressedData;
   }
 
   public String decompress(CompressResult compressResult) {
@@ -44,11 +46,52 @@ public class HuffmanEncoder {
       queue.add(newNode);
     }
 
-
     return queue.poll();
   }
 
-  static class CompressResult {
+  public GenericArray<CharCodeMap> buildCharCodeMap(Node root) {
+    GenericArray<CharCodeMap> codeMap = new GenericArray<CharCodeMap>(root.getFrequency());
 
+    getCodes(root, "", codeMap);
+
+    return codeMap;
+  }
+
+  public void getCodes(Node node, String code, GenericArray<CharCodeMap> codeMap) {
+    if (!node.isLeaf()) {
+      getCodes(node.getLeft(), code + "0", codeMap);
+      getCodes(node.getRight(), code + "1", codeMap);
+    } else {
+      codeMap.push(new CharCodeMap((char) node.getCharacter(), code));
+    }
+  }
+
+  public CompressResult getCompressedData(String data, GenericArray<CharCodeMap> charCodeMap, Node root) {
+    String ret = "";
+
+    for (char character : data.toCharArray()) {
+      for (int i = 0; i < charCodeMap.size(); i++) {
+        if (charCodeMap.get(i).character == character) {
+          ret += charCodeMap.get(i).code;
+          break;
+        }
+      }
+    }
+
+    return new CompressResult(ret, root);
+  }
+
+  static class CompressResult {
+    String compressedData;
+    Node root;
+
+    public CompressResult(String compressedData, Node root) {
+      this.compressedData = compressedData;
+      this.root = root;
+    }
+
+    public String toString() {
+      return compressedData;
+    }
   }
 }

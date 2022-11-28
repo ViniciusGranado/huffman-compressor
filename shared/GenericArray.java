@@ -56,6 +56,11 @@ public class GenericArray<T> {
     len = 0;
   }
 
+  public void push(T value) {
+    values[len] = value;
+    len++;
+  }
+
   public T get(int index) {
     return (T) values[index];
   }
