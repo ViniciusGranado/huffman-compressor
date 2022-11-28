@@ -1,3 +1,4 @@
+package shared;
 public class Node implements Comparable<Node> {
   private int frequency;
   private char character;

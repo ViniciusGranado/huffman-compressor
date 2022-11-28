@@ -1,3 +1,4 @@
+package shared;
 import java.util.Collections;
 import java.util.PriorityQueue;
 
@@ -22,7 +23,7 @@ public class HuffmanEncoder {
   }  
 
   public static Node geHuffmanTree(int[] frequency) {
-    PriorityQueue<Node> queue = new PriorityQueue<>();
+    Priority<Node> queue = new Priority<>();
 
     for (char i = 0; i < 256; i++) {
       if (frequency[i] > 0) {

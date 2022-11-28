@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+package shared;
 
 public class Priority<T extends Comparable<T>> {
   GenericArray<T> values;
@@ -8,6 +8,9 @@ public class Priority<T extends Comparable<T>> {
     values = new GenericArray<T>(256);
     len = 0;
   }
+   public int size() {
+    return len;
+   }
 
   public void add(T object) {
     if (len == 0) {
@@ -17,7 +20,6 @@ public class Priority<T extends Comparable<T>> {
     }
 
     int currentIndex = len - 1;
-    int comparisonValue = values.get(currentIndex).compareTo(object);
 
     do {
       if (values.get(currentIndex).compareTo(object) < 0) {
@@ -33,6 +35,11 @@ public class Priority<T extends Comparable<T>> {
     }
   
     len++;
+  }
+
+  public T poll () {
+    len--;
+    return values.remove(0);
   }
 
   public String toString() {
