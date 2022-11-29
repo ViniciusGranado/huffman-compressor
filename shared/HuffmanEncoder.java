@@ -1,9 +1,9 @@
 package shared;
 
 public class HuffmanEncoder {
-  public CompressResult compress (String data) {
+  public CompressResult compress (FileManager data) {
     int[] frequency = getFrequencyArray(data);
-    Node root = geHuffmanTree(frequency);
+    Node root = getHuffmanTree(frequency);
     GenericArray<CharCodeMap> charCodeMap = buildCharCodeMap(root);
 
     CompressResult compressedData = getCompressedData(data, charCodeMap, root);
@@ -11,20 +11,48 @@ public class HuffmanEncoder {
   }
 
   public String decompress(CompressResult compressResult) {
-    return null;
+    Node root = compressResult.root;
+    String compressedData = compressResult.compressedData;
+    String ret = "";
+
+    Node node = root;
+
+    for (int i = 0; i < compressedData.length();) {
+      while (!node.isLeaf()) {
+        char character = compressedData.charAt(i);
+
+        if (character == '0') {
+          node = node.getLeft();
+        } else {
+          node = node.getRight();
+        }
+
+        i++;
+      }
+
+      ret += (char) node.getCharacter();
+      node = root;
+    }
+
+    return ret;
   }
 
-  public static int[] getFrequencyArray(String data) {
+  public static int[] getFrequencyArray(FileManager data) {
     int[] frequency = new int[256]; // Valor 256 pois é o número de caracteres possíveos na tabela ASCII
+    boolean isEndOfFile = false;
 
-    for (char c : data.toCharArray()) {
+    while (!isEndOfFile) {
+      char c = data.readChar();
       frequency[c]++;
+
+      isEndOfFile = data.gotToEndOfFile();
     }
+
 
     return frequency;
   }  
 
-  public static Node geHuffmanTree(int[] frequency) {
+  public static Node getHuffmanTree(int[] frequency) {
     Priority<Node> queue = new Priority<>();
 
     for (char i = 0; i < 256; i++) {
@@ -66,16 +94,22 @@ public class HuffmanEncoder {
     }
   }
 
-  public CompressResult getCompressedData(String data, GenericArray<CharCodeMap> charCodeMap, Node root) {
+  public CompressResult getCompressedData(FileManager data, GenericArray<CharCodeMap> charCodeMap, Node root) {
+    data.resetReading();
     String ret = "";
+    boolean isEndOfFile = false;
 
-    for (char character : data.toCharArray()) {
+    while (!isEndOfFile) {
+      char c = data.readChar();
+      
       for (int i = 0; i < charCodeMap.size(); i++) {
-        if (charCodeMap.get(i).character == character) {
+        if (charCodeMap.get(i).character == c) {
           ret += charCodeMap.get(i).code;
           break;
         }
       }
+
+      isEndOfFile = data.gotToEndOfFile();
     }
 
     return new CompressResult(ret, root);
