@@ -1,9 +1,23 @@
 package shared;
 public class Node implements Comparable<Node> {
-  private int frequency;
-  private char character;
+  private Integer frequency;
+  private Character character;
   private Node left;
   private Node right;
+
+  public Node () {
+    this.frequency = null;
+    this.character = null;
+    this.left = null;
+    this.right = null;
+  }
+
+  public Node (char character) {
+    this.frequency = null;
+    this.character = character;
+    this.left = null;
+    this.right = null;
+  }
 
   public Node (int frequency, char character) {
     this.frequency = frequency;

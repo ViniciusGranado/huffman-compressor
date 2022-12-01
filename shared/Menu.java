@@ -27,4 +27,20 @@ public class Menu {
   public static void printNewFileName() {
     System.out.print("\nDigite o nome do arquivo que será gerado: ");
   }
+
+  public static void printCompressing() {
+    System.out.println("\nComprimindo...");
+  }
+
+  public static void printDecompressing() {
+    System.out.println("\nDescompactando...");
+  }
+
+  public static void printCompressed() {
+    System.out.println("\nO arquivo foi compactado com sucesso!");
+  }
+
+  public static void printDecompressed() {
+    System.out.println("\nO arquivo foi descompactado com sucesso!");
+  }
 }

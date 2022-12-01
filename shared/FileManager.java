@@ -24,6 +24,20 @@ public class FileManager {
 		return character;
 	}
 
+	public int readIntChar() {
+		int character = 0;
+
+		try {
+      character = file.read();
+			position++;
+		} catch (Exception e) {
+			System.out.println(e);
+			System.exit(0);
+		}
+
+		return character;
+	}
+
   public void writeChar(char character) {
 		try {
       file.write(character);

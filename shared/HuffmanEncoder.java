@@ -1,7 +1,7 @@
 package shared;
 
 public class HuffmanEncoder {
-  public CompressResult compress (FileManager data, String newFilename) {
+  public void compress(FileManager data, String newFilename) {
     int[] frequency = getFrequencyArray(data);
     Node root = getHuffmanTree(frequency);
     GenericArray<CharCodeMap> charCodeMap = buildCharCodeMap(root);
@@ -11,23 +11,34 @@ public class HuffmanEncoder {
     FileManager compressedFile = null;
 
     try {
-      compressedFile = new FileManager(newFilename, "rw");
-    } catch(Exception e) {
+      compressedFile = new FileManager(newFilename + ".edd", "rw");
+    } catch (Exception e) {
       System.out.println(e);
       System.exit(0);
     }
 
-    compressedFile.generateCompressedFile("this is a test");
-      
-    return compressedData;
+    StringBuilder stringBuilder = new StringBuilder();
+    compressCodeMap(charCodeMap, stringBuilder);
+    String newFileContent = stringBuilder.toString() + compressedData.getCompressedData();
+    compressedFile.generateCompressedFile(newFileContent);
   }
 
-  public String decompress(CompressResult compressResult) {
-    Node root = compressResult.root;
-    String compressedData = compressResult.compressedData;
-    String ret = "";
+  public void decompress(FileManager data, String newFilename) {
+    Node root = new Node();
+    decompressMap(data, root);
 
+    String compressedData = getCompressedData(data);
+    String decompressedString = "";
     Node node = root;
+
+    FileManager decompressedFile = null;
+
+    try {
+      decompressedFile = new FileManager(newFilename, "rw");
+    } catch (Exception e) {
+      System.out.println(e);
+      System.exit(0);
+    }
 
     for (int i = 0; i < compressedData.length();) {
       while (!node.isLeaf()) {
@@ -42,11 +53,13 @@ public class HuffmanEncoder {
         i++;
       }
 
-      ret += (char) node.getCharacter();
+      decompressedFile.writeChar((char) node.getCharacter());
       node = root;
     }
 
-    return ret;
+    for (char c : decompressedString.toCharArray()) {
+      decompressedFile.writeChar(c);
+    }
   }
 
   public static int[] getFrequencyArray(FileManager data) {
@@ -60,9 +73,8 @@ public class HuffmanEncoder {
       isEndOfFile = data.gotToEndOfFile();
     }
 
-
     return frequency;
-  }  
+  }
 
   public static Node getHuffmanTree(int[] frequency) {
     Priority<Node> queue = new Priority<>();
@@ -77,7 +89,7 @@ public class HuffmanEncoder {
       queue.add(new Node(1, '\0', null, null));
     }
 
-    while(queue.size() > 1) {
+    while (queue.size() > 1) {
       Node left = queue.poll();
       Node right = queue.poll();
 
@@ -113,7 +125,7 @@ public class HuffmanEncoder {
 
     while (!isEndOfFile) {
       char c = data.readChar();
-      
+
       for (int i = 0; i < charCodeMap.size(); i++) {
         if (charCodeMap.get(i).character == c) {
           ret += charCodeMap.get(i).code;
@@ -127,6 +139,87 @@ public class HuffmanEncoder {
     return new CompressResult(ret, root);
   }
 
+  public String getCompressedData(FileManager data) {
+    String ret = "";
+    boolean isEndOfFile = false;
+
+    while (!isEndOfFile) {
+      char c = data.readChar();
+
+      ret += c;
+
+      isEndOfFile = data.gotToEndOfFile();
+    }
+
+    return ret;
+  }
+
+  private void compressCodeMap(GenericArray<CharCodeMap> codeMap, StringBuilder stringBuilder) {
+    for (int i = 0; i < codeMap.size(); i++) {
+      CharCodeMap cm = codeMap.get(i);
+      stringBuilder.append(cm.character);
+      stringBuilder.append(cm.code);
+      stringBuilder.append((char) 0);
+    }
+    stringBuilder.append((char) 4);
+  }
+
+  private void decompressMap(FileManager data, Node root) {
+    Node node = root;
+
+    while (true) {
+      char character = data.readChar();
+      Character c = null;
+
+      if (character == (char) 4) {
+        break;
+      }
+
+      String code = "";
+      while (true) {
+        c = data.readChar();
+
+        if (c == (char) 0) {
+          break;
+        }
+
+        code += c;
+      }
+
+      for (int i = 0; i < code.length(); i++) {
+        if (code.charAt(i) == '0') {
+          Node left = node.getLeft();
+
+          if (left == null) {
+            node.setLeft(new Node());
+          }
+          
+          node = node.getLeft();
+
+          if (i == code.length() - 1) {
+            node.setCharacter(character);
+          }
+        }
+
+        if (code.charAt(i) == '1') {
+          Node right = node.getRight();
+
+          if (right == null) {
+            node.setRight(new Node());
+          }
+          
+          node = node.getRight();
+
+          if (i == code.length() - 1) {
+            node.setCharacter(character);
+          }
+        }
+      }
+      
+      node = root;
+    }
+  }
+
   static class CompressResult {
     String compressedData;
     Node root;
@@ -134,6 +227,10 @@ public class HuffmanEncoder {
     public CompressResult(String compressedData, Node root) {
       this.compressedData = compressedData;
       this.root = root;
+    }
+
+    public String getCompressedData() {
+      return compressedData;
     }
 
     public String toString() {

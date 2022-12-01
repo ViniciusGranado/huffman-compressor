@@ -35,6 +35,7 @@ public class HuffmanCompressor {
     String filename = null;
     String newFilename = null;
     FileManager file = null;
+
     if (Integer.parseInt(userOption) == 1) {
       do {
         Menu.printFileCompress();
@@ -47,6 +48,32 @@ public class HuffmanCompressor {
         }
       } while (true);
 
+      Menu.printNewFileName();
+      try {
+        newFilename = reader.readLine();
+      } catch(Exception e) {
+        System.out.println(e);
+        System.exit(0);
+      }
+
+      Menu.printCompressing();
+
+      huffman.compress(file, newFilename);
+
+      Menu.printCompressed();
+    }
+
+    if (Integer.parseInt(userOption) == 2) {
+      do {
+        Menu.printFileDecompress();
+        try {
+          filename = reader.readLine();
+          file = new FileManager(filename, "r");
+          break;
+        } catch(Exception e) {
+          System.out.println("\nERRO: Digite um nome de arquivo valido!");
+        }
+      } while (true);
 
       Menu.printNewFileName();
       try {
@@ -56,22 +83,14 @@ public class HuffmanCompressor {
         System.exit(0);
       }
 
-      System.out.println(huffman.compress(file, newFilename));
-    }
+      Menu.printDecompressing();
 
-    if (Integer.parseInt(userOption) == 2) {
-      Menu.printFileDecompress();
+      huffman.decompress(file, newFilename);
 
+      Menu.printDecompressed();
       try {
         filename = reader.readLine();
       } catch(Exception e) {}
     }
-
-    // String text = "Esse e um texto de testes para compactacao";
-
-    // HuffmanEncoder compressor = new HuffmanEncoder();
-
-    // System.out.println("Compressed: " + compressor.compress(text));
-    // System.out.println("Decompressed: "+ compressor.decompress(compressor.compress(text)));
   } 
 } 
