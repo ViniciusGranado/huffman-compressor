@@ -23,4 +23,8 @@ public class Menu {
   public static void printFileDecompress() {
     System.out.print("\nDigite o nome do arquivo que deseja descompactar: ");
   }
+
+  public static void printNewFileName() {
+    System.out.print("\nDigite o nome do arquivo que será gerado: ");
+  }
 }

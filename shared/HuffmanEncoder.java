@@ -1,12 +1,24 @@
 package shared;
 
 public class HuffmanEncoder {
-  public CompressResult compress (FileManager data) {
+  public CompressResult compress (FileManager data, String newFilename) {
     int[] frequency = getFrequencyArray(data);
     Node root = getHuffmanTree(frequency);
     GenericArray<CharCodeMap> charCodeMap = buildCharCodeMap(root);
 
     CompressResult compressedData = getCompressedData(data, charCodeMap, root);
+
+    FileManager compressedFile = null;
+
+    try {
+      compressedFile = new FileManager(newFilename, "rw");
+    } catch(Exception e) {
+      System.out.println(e);
+      System.exit(0);
+    }
+
+    compressedFile.generateCompressedFile("this is a test");
+      
     return compressedData;
   }
 

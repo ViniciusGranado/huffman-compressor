@@ -33,20 +33,30 @@ public class HuffmanCompressor {
     } while(true);
 
     String filename = null;
+    String newFilename = null;
     FileManager file = null;
     if (Integer.parseInt(userOption) == 1) {
       do {
         Menu.printFileCompress();
         try {
           filename = reader.readLine();
-          file = new FileManager(filename);
+          file = new FileManager(filename, "r");
           break;
         } catch(Exception e) {
           System.out.println("\nERRO: Digite um nome de arquivo valido!");
         }
       } while (true);
 
-      System.out.println(huffman.compress(file));
+
+      Menu.printNewFileName();
+      try {
+        newFilename = reader.readLine();
+      } catch(Exception e) {
+        System.out.println(e);
+        System.exit(0);
+      }
+
+      System.out.println(huffman.compress(file, newFilename));
     }
 
     if (Integer.parseInt(userOption) == 2) {

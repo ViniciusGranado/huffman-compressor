@@ -6,8 +6,8 @@ public class FileManager {
   private RandomAccessFile file;
   private long position;
 
-  public FileManager(String filename) throws Exception {
-    file = new RandomAccessFile(filename, "r");
+  public FileManager(String filename, String mode) throws Exception {
+    file = new RandomAccessFile(filename, mode);
   }
 
   public char readChar() {
@@ -22,6 +22,15 @@ public class FileManager {
 		}
 
 		return character;
+	}
+
+  public void writeChar(char character) {
+		try {
+      file.write(character);
+		} catch (Exception e) {
+			System.out.println(e);
+			System.exit(0);
+		}
 	}
 
   public Boolean gotToEndOfFile() {
@@ -44,4 +53,21 @@ public class FileManager {
 			System.exit(0);
 		}
 	}
+
+  public void close() {
+		try {
+			file.close();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.exit(0);
+		}
+	}
+
+  public void generateCompressedFile(String code) {
+    for(char c : code.toCharArray()) {
+      writeChar(c);
+    }
+
+    close();
+  }
 }
