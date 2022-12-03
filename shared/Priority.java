@@ -1,11 +1,13 @@
 package shared;
 
+import java.util.ArrayList;
+
 public class Priority<T extends Comparable<T>> {
-  GenericArray<T> values;
+  ArrayList<T> values;
   int len;
 
   public Priority() {
-    values = new GenericArray<T>(256);
+    values = new ArrayList<T>();
     len = 0;
   }
    public int size() {

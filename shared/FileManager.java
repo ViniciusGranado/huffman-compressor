@@ -10,37 +10,31 @@ public class FileManager {
     file = new RandomAccessFile(filename, mode);
   }
 
-  public char readChar() {
-		char character = 0;
+	public RandomAccessFile getFile() {
+		return file;
+	}
+
+	public long getPosition() {
+		return position;
+	}
+
+  public byte readByte() {
+		byte byt = 0;
 
 		try {
-      character = (char) file.read();
+      byt = file.readByte();
 			position++;
 		} catch (Exception e) {
 			System.out.println(e);
 			System.exit(0);
 		}
 
-		return character;
+		return byt;
 	}
 
-	public int readIntChar() {
-		int character = 0;
-
+  public void writeByte(byte byt) {
 		try {
-      character = file.read();
-			position++;
-		} catch (Exception e) {
-			System.out.println(e);
-			System.exit(0);
-		}
-
-		return character;
-	}
-
-  public void writeChar(char character) {
-		try {
-      file.write(character);
+      file.writeByte(byt);
 		} catch (Exception e) {
 			System.out.println(e);
 			System.exit(0);
@@ -78,9 +72,15 @@ public class FileManager {
 	}
 
   public void generateCompressedFile(String code) {
-    for(char c : code.toCharArray()) {
-      writeChar(c);
-    }
+		String byteString = "";
+		for (int i = 0; i < code.toCharArray().length; i++) {
+      byteString += code.charAt(i);
+
+			if (byteString.length() == 8) {
+				writeByte(ByteHelper.stringToByte(byteString));
+				byteString = "";
+			}
+		}
 
     close();
   }

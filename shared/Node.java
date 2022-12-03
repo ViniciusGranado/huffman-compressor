@@ -1,52 +1,52 @@
 package shared;
 public class Node implements Comparable<Node> {
-  private Integer frequency;
-  private Character character;
+  private Byte frequency;
+  private Byte byt;
   private Node left;
   private Node right;
 
   public Node () {
     this.frequency = null;
-    this.character = null;
+    this.byt = null;
     this.left = null;
     this.right = null;
   }
 
-  public Node (char character) {
+  public Node (byte byt) {
     this.frequency = null;
-    this.character = character;
+    this.byt = byt;
     this.left = null;
     this.right = null;
   }
 
-  public Node (int frequency, char character) {
+  public Node (byte frequency, byte byt) {
     this.frequency = frequency;
-    this.character = character;
+    this.byt = byt;
     this.left = null;
     this.right = null;
   }
 
-  public Node (int frequency, char character, Node left, Node right) {
+  public Node (byte frequency, byte byt, Node left, Node right) {
     this.frequency = frequency;
-    this.character = character;
+    this.byt = byt;
     this.left = left;
     this.right = right;
   }
 
-  public int getFrequency() {
+  public byte getFrequency() {
     return frequency;
   }
 
-  public void setFrequency(int frequency) {
+  public void setFrequency(byte frequency) {
     this.frequency = frequency;
   }
 
-  public int getCharacter() {
-    return character;
+  public byte getByte() {
+    return byt;
   }
 
-  public void setCharacter(char character) {
-    this.character = character;
+  public void setByte(byte byt) {
+    this.byt = byt;
   }
 
   public Node getLeft() {
@@ -67,6 +67,10 @@ public class Node implements Comparable<Node> {
 
   public boolean isLeaf() {
     return (left == null && right == null);
+  }
+
+  public void addFrequency() {
+    frequency++;
   }
 
   @Override

@@ -45,6 +45,7 @@ public class HuffmanCompressor {
           break;
         } catch(Exception e) {
           System.out.println("\nERRO: Digite um nome de arquivo valido!");
+          System.out.println(e);
         }
       } while (true);
 
@@ -63,34 +64,31 @@ public class HuffmanCompressor {
       Menu.printCompressed();
     }
 
-    if (Integer.parseInt(userOption) == 2) {
-      do {
-        Menu.printFileDecompress();
-        try {
-          filename = reader.readLine();
-          file = new FileManager(filename, "r");
-          break;
-        } catch(Exception e) {
-          System.out.println("\nERRO: Digite um nome de arquivo valido!");
-        }
-      } while (true);
+  //   if (Integer.parseInt(userOption) == 2) {
+  //     do {
+  //       Menu.printFileDecompress();
+  //       try {
+  //         filename = reader.readLine();
+  //         file = new FileManager(filename, "rb");
+  //         break;
+  //       } catch(Exception e) {
+  //         System.out.println("\nERRO: Digite um nome de arquivo valido!");
+  //       }
+  //     } while (true);
 
-      Menu.printNewFileName();
-      try {
-        newFilename = reader.readLine();
-      } catch(Exception e) {
-        System.out.println(e);
-        System.exit(0);
-      }
+  //     Menu.printNewFileName();
+  //     try {
+  //       newFilename = reader.readLine();
+  //     } catch(Exception e) {
+  //       System.out.println(e);
+  //       System.exit(0);
+  //     }
 
-      Menu.printDecompressing();
+  //     Menu.printDecompressing();
 
-      huffman.decompress(file, newFilename);
+  //     huffman.decompress(file, newFilename);
 
-      Menu.printDecompressed();
-      try {
-        filename = reader.readLine();
-      } catch(Exception e) {}
-    }
+  //     Menu.printDecompressed();
+  //   }
   } 
 } 

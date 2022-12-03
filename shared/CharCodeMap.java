@@ -1,11 +1,13 @@
 package shared;
 
 public class CharCodeMap {
-  public char character;
+  public byte byt;
+  public byte frequency;
   public String code;
 
-  public CharCodeMap(char character, String code) {
-    this.character = character;
+  public CharCodeMap(byte byt, byte frequency, String code) {
+    this.byt = byt;
+    this.frequency = frequency;
     this.code = code;
   }
 }
