@@ -64,31 +64,32 @@ public class HuffmanCompressor {
       Menu.printCompressed();
     }
 
-  //   if (Integer.parseInt(userOption) == 2) {
-  //     do {
-  //       Menu.printFileDecompress();
-  //       try {
-  //         filename = reader.readLine();
-  //         file = new FileManager(filename, "rb");
-  //         break;
-  //       } catch(Exception e) {
-  //         System.out.println("\nERRO: Digite um nome de arquivo valido!");
-  //       }
-  //     } while (true);
+    if (Integer.parseInt(userOption) == 2) {
+      do {
+        Menu.printFileDecompress();
+        try {
+          filename = reader.readLine();
+          file = new FileManager(filename, "r");
+          break;
+        } catch(Exception e) {
+          System.out.println("\nERRO: Digite um nome de arquivo valido!");
+          System.out.println(e);
+        }
+      } while (true);
 
-  //     Menu.printNewFileName();
-  //     try {
-  //       newFilename = reader.readLine();
-  //     } catch(Exception e) {
-  //       System.out.println(e);
-  //       System.exit(0);
-  //     }
+      Menu.printNewFileName();
+      try {
+        newFilename = reader.readLine();
+      } catch(Exception e) {
+        System.out.println(e);
+        System.exit(0);
+      }
 
-  //     Menu.printDecompressing();
+      Menu.printDecompressing();
 
-  //     huffman.decompress(file, newFilename);
+      huffman.decompress(file, newFilename);
 
-  //     Menu.printDecompressed();
-  //   }
+      Menu.printDecompressed();
+    }
   } 
 } 

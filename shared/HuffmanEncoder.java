@@ -1,15 +1,17 @@
 package shared;
 
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HuffmanEncoder {
   public void compress(FileManager data, String newFilename) {
-    ArrayList<Node> frequency = getFrequencyArray(data);
-    Node root = getHuffmanTree(frequency);
-    ArrayList<CharCodeMap> charCodeMap = buildCharCodeMap(root);
+    Map<Byte, Integer> frequency = getFrequencyMap(data.getBytesArr());
+    Priority<Node> priorityQueue = getPriorityQueue(frequency);
+    HuffmanTree tree = new HuffmanTree(priorityQueue);
+    Map<Byte, String> charCodeMap = buildCharCodeMap(tree.getRoot());
 
-    CompressResult compressedData = getCompressedData(data, charCodeMap, root);
+    CompressResult compressedData = getCompressedData(data, charCodeMap, tree.getRoot());
 
     FileManager compressedFile = null;
 
@@ -21,138 +23,106 @@ public class HuffmanEncoder {
     }
 
     String newFileContent = compressedData.getCompressedData();
-    compressCodeMap(charCodeMap, compressedFile, newFileContent.length() % 8);
-    compressedFile.generateCompressedFile(newFileContent);
+
+    generateCompressedFile(tree, newFileContent, compressedFile);
   }
 
-  // public void decompress(FileManager data, String newFilename) {
-  //   Node root = new Node();
-  //   decompressMap(data, root);
-
-  //   String compressedData = getCompressedData(data);
-  //   String decompressedString = "";
-  //   Node node = root;
-
-  //   FileManager decompressedFile = null;
-
-  //   try {
-  //     decompressedFile = new FileManager(newFilename, "w");
-  //   } catch (Exception e) {
-  //     System.out.println(e);
-  //     System.exit(0);
-  //   }
-
-  //   for (int i = 0; i < compressedData.length();) {
-  //     while (!node.isLeaf()) {
-  //       char character = compressedData.charAt(i);
-
-  //       if (character == '0') {
-  //         node = node.getLeft();
-  //       } else {
-  //         node = node.getRight();
-  //       }
-
-  //       i++;
-  //     }
-
-  //     decompressedFile.writeByte(node.getByte());
-  //     node = root;
-  //   }
-
-  //   for (char c : decompressedString.toCharArray()) {
-  //     decompressedFile.writeChar(c);
-  //   }
-  // }
-
-  public static ArrayList<Node> getFrequencyArray(FileManager data) {
-    ArrayList<Node> frequency = new ArrayList<>();
-    ArrayList<Byte> byteControl = new ArrayList<>();
-    boolean isEndOfFile = false;
-
-    while (!isEndOfFile) {
-      byte b = data.readByte();
-
-      if (frequency.size() == 0) {
-        byteControl.add(b);
-        frequency.add(new Node(1, b));
-        isEndOfFile = data.gotToEndOfFile();
-        continue;
-      }
-
-      int index = byteControl.indexOf(b);
-      if (index != -1) {
-        frequency.get(index).addFrequency();
-        isEndOfFile = data.gotToEndOfFile();
-        continue;
-      }
-
-      byteControl.add(b);
-      frequency.add(new Node(1, b));
-
-      isEndOfFile = data.gotToEndOfFile();
+  public void decompress(FileManager data, String newFilename) {
+    Node root = new Node();
+    byte endUsefulBits = 0;
+    
+    try {
+      endUsefulBits = decompressMap(data, root);
+    } catch(Exception e) {
+      System.out.println(e);
+      System.exit(0);
     }
 
-    return frequency;
+    // String compressedData = getCompressedData(data);
+    // String decompressedString = "";
+    // Node node = root;
+
+    // FileManager decompressedFile = null;
+
+    // try {
+    //   decompressedFile = new FileManager(newFilename, "w");
+    // } catch (Exception e) {
+    //   System.out.println(e);
+    //   System.exit(0);
+    // }
+
+    // for (int i = 0; i < compressedData.length();) {
+    //   while (!node.isLeaf()) {
+    //     char character = compressedData.charAt(i);
+
+    //     if (character == '0') {
+    //       node = node.getLeft();
+    //     } else {
+    //       node = node.getRight();
+    //     }
+
+    //     i++;
+    //   }
+
+    //   decompressedFile.writeByte(node.getByte());
+    //   node = root;
+    // }
+
+    // for (char c : decompressedString.toCharArray()) {
+    //   decompressedFile.writeChar(c);
+    // }
   }
 
-  public static Node getHuffmanTree(ArrayList<Node> frequency) {
+  public static Map<Byte, Integer> getFrequencyMap(byte[] byteArr) {
+    Map<Byte, Integer> frequencyMap = new HashMap<>();
+
+    for (byte byt : byteArr) {
+      if (frequencyMap.containsKey(byt)) {
+        frequencyMap.put(byt, frequencyMap.get(byt) + 1);
+        continue;
+      }
+
+      frequencyMap.put(byt, 1);
+    }
+
+    return frequencyMap;
+  }
+
+  private Priority<Node> getPriorityQueue(Map<Byte, Integer> frequencyMap) {
     Priority<Node> queue = new Priority<>();
 
-    for (Node node : frequency) {
-      if (node.getFrequency() > 0) {
-        queue.add(new Node(node.getFrequency(), node.getByte()));
+    for (Map.Entry<Byte, Integer> frequency : frequencyMap.entrySet()) {
+      if (frequency.getValue() > 0) {
+        queue.add(new Node(frequency.getValue(), frequency.getKey()));
       }
     }
 
-    if (queue.size() == 1) {
-      queue.add(new Node(1, (byte) 0, null, null));
-    }
-
-    while (queue.size() > 1) {
-      Node left = queue.poll();
-      Node right = queue.poll();
-
-      Node newNode = new Node((left.getFrequency() + right.getFrequency()), null, left, right);
-
-      queue.add(newNode);
-    }
-
-    return queue.poll();
+    return queue;
   }
 
-  public ArrayList<CharCodeMap> buildCharCodeMap(Node root) {
-    ArrayList<CharCodeMap> codeMap = new ArrayList<CharCodeMap>(root.getFrequency());
+  private Map<Byte, String> buildCharCodeMap(Node root) {
+    Map<Byte, String> codeMap = new HashMap<Byte, String>();
 
     getCodes(root, "", codeMap);
 
     return codeMap;
   }
 
-  public void getCodes(Node node, String code, ArrayList<CharCodeMap> codeMap) {
+  private void getCodes(Node node, String code, Map<Byte, String> codeMap) {
     if (!node.isLeaf()) {
       getCodes(node.getLeft(), code + "0", codeMap);
       getCodes(node.getRight(), code + "1", codeMap);
     } else {
-      codeMap.add(new CharCodeMap(node.getByte(), node.getFrequency(), code));
+      codeMap.put(node.getByte(), code);
     }
   }
 
-  public CompressResult getCompressedData(FileManager data, ArrayList<CharCodeMap> charCodeMap, Node root) {
-    data.resetReading();
+  private CompressResult getCompressedData(FileManager data, Map<Byte, String> charCodeMap, Node root) {
     String ret = "";
-    boolean isEndOfFile = false;
 
-    while (!isEndOfFile) {
-      byte b = data.readByte();
-
-      for (int i = 0; i < charCodeMap.size(); i++) {
-        if (charCodeMap.get(i).byt == b) {
-          ret += charCodeMap.get(i).code;
-          break;
-        }
-      }
-
-      isEndOfFile = data.gotToEndOfFile();
+    for (byte b : data.getBytesArr()) {
+      String code = charCodeMap.get(b);
+      ret += code;
     }
 
     return new CompressResult(ret, root);
@@ -173,73 +143,89 @@ public class HuffmanEncoder {
   //   return ret;
   // }
 
-  private void compressCodeMap(ArrayList<CharCodeMap> codeMap, FileManager file, int endUsefulBits) {
-    for (int i = 0; i < codeMap.size(); i++) {
-      CharCodeMap cm = codeMap.get(i);
-      file.writeByte(cm.byt);
-      file.writeInt(cm.frequency);
-      file.writeByte((byte) 0);
+  private void generateCompressedFile(HuffmanTree tree, String newFileContent, FileManager newFile) {
+    int endUsefulBits = newFileContent.length() % 8;
+
+    newFile.writeByte((byte) endUsefulBits);
+
+    StringBuilder stringTree = new StringBuilder();
+    treeToString(tree.getRoot(), stringTree);
+
+		for (char c : stringTree.toString().toCharArray()) {
+			if (c == '0') {
+				newFile.writeByte((byte) 0);
+			} else if (c == '1') {
+				newFile.writeByte((byte) 1);
+			} else {
+				newFile.writeChar(c);
+			}
+		}
+
+    StringBuilder newFileContentSb = new StringBuilder(newFileContent);
+    
+    for (int i = 0; i < endUsefulBits; i++) {
+      newFileContentSb.append('0');
     }
 
-    file.writeByte((byte) endUsefulBits);
-    file.writeByte((byte) 0);
+    newFileContent = newFileContentSb.toString();
+    String aux = "";
+
+    for (char c : newFileContent.toCharArray()) {
+      aux += c;
+
+      if (aux.length() == 8) {
+        newFile.writeByte(ByteHelper.stringToByte(aux));
+        aux = "";
+      }
+    }
   }
 
-  // private void decompressMap(FileManager data, Node root) {
-  //   Node node = root;
+  private void treeToString(Node root, StringBuilder stringTree) {
+		if (root != null) {
+			if (root.getLeft() == null && root.getRight() == null) {
+				stringTree.append(0);
+				stringTree.append(root.getByte());
+			} else {
+				stringTree.append(1);
+			}
+			treeToString(root.getLeft(), stringTree);
+			treeToString(root.getRight(), stringTree);
+		}
+  }
 
-  //   while (true) {
-  //     char character = data.readChar();
-  //     Character c = null;
+  private byte decompressMap(FileManager data, Node root) throws Exception {
+    ArrayList<Node> frequencyArr = new ArrayList<>();
 
-  //     if (character == (char) 4) {
-  //       break;
-  //     }
+    while (true) {
+      Byte byt = data.readByte();
+      int frequency = data.readInt();
 
-  //     String code = "";
-  //     while (true) {
-  //       c = data.readChar();
+      frequencyArr.add(new Node(frequency, byt));
 
-  //       if (c == (char) 0) {
-  //         break;
-  //       }
+      char c = data.readCharWithoutChanginPosition();
 
-  //       code += c;
-  //     }
+      if (c == (char) 0) {
+        data.readChar();
+        break;
+      }
+    }
 
-  //     for (int i = 0; i < code.length(); i++) {
-  //       if (code.charAt(i) == '0') {
-  //         Node left = node.getLeft();
+    char c = data.readChar();
 
-  //         if (left == null) {
-  //           node.setLeft(new Node());
-  //         }
+    if (c != (char) 0) {
+      throw new Exception("Arquivo compactado incorretamente");
+    }
 
-  //         node = node.getLeft();
+    byte endUsefulBits = data.readByte();
 
-  //         if (i == code.length() - 1) {
-  //           node.setCharacter(character);
-  //         }
-  //       }
+    c = data.readChar();
 
-  //       if (code.charAt(i) == '1') {
-  //         Node right = node.getRight();
+    if (c != (char) 0) {
+      throw new Exception("Arquivo compactado incorretamente");
+    }
 
-  //         if (right == null) {
-  //           node.setRight(new Node());
-  //         }
-
-  //         node = node.getRight();
-
-  //         if (i == code.length() - 1) {
-  //           node.setCharacter(character);
-  //         }
-  //       }
-  //     }
-
-  //     node = root;
-  //   }
-  // }
+    return endUsefulBits;
+  }
 
   static class CompressResult {
     String compressedData;

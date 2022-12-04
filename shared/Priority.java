@@ -10,9 +10,10 @@ public class Priority<T extends Comparable<T>> {
     values = new ArrayList<T>();
     len = 0;
   }
-   public int size() {
-    return len;
-   }
+
+  public int size() {
+  return len;
+  }
 
   public void add(T object) {
     if (len == 0) {
@@ -45,18 +46,12 @@ public class Priority<T extends Comparable<T>> {
   }
 
   public String toString() {
-    if (values.size() == 0) return "[]";
-    String ret = "[";
+    StringBuilder sb = new StringBuilder();
 
-    for (int i = 0; i < values.size(); i++) {
-      if (i == values.size() - 1) {
-        ret += values.get(i) + "]";
-        continue;
-      }
-
-      ret += values.get(i) + ", ";
+    for (Node node : (ArrayList<Node>) values) {
+      sb.append(node.getByte() + " " + node.getFrequency());
     }
 
-    return ret;
+    return sb.toString();
   }
 }

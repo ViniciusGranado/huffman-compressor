@@ -5,9 +5,12 @@ import java.io.RandomAccessFile;
 public class FileManager {
   private RandomAccessFile file;
   private long position;
+	private byte[] bytesArr;
 
   public FileManager(String filename, String mode) throws Exception {
-    file = new RandomAccessFile(filename, mode);
+    file = new RandomAccessFile(filename, mode); 
+		bytesArr = new byte[(int) file.length()];
+		file.read(bytesArr);
   }
 
 	public RandomAccessFile getFile() {
@@ -16,6 +19,10 @@ public class FileManager {
 
 	public long getPosition() {
 		return position;
+	}
+
+	public byte[] getBytesArr() {
+		return bytesArr;
 	}
 
   public byte readByte() {
@@ -32,6 +39,48 @@ public class FileManager {
 		return byt;
 	}
 
+	public int readInt() {
+		int value = 0;
+
+		try {
+      value = file.readInt();
+			position++;
+		} catch (Exception e) {
+			System.out.println(e);
+			System.exit(0);
+		}
+
+		return value;
+	}
+
+	public char readChar() {
+		char value = 0;
+
+		try {
+      value = file.readChar();
+			position++;
+		} catch (Exception e) {
+			System.out.println(e);
+			System.exit(0);
+		}
+
+		return value;
+	}
+
+	public char readCharWithoutChanginPosition() {
+		char value = 0;
+
+		try {
+      value = file.readChar();
+			file.seek(position);
+		} catch (Exception e) {
+			System.out.println(e);
+			System.exit(0);
+		}
+
+		return value;
+	}
+
   public void writeByte(byte byt) {
 		try {
       file.writeByte(byt);
@@ -44,6 +93,15 @@ public class FileManager {
 	public void writeInt(int value) {
 		try {
       file.writeInt(value);
+		} catch (Exception e) {
+			System.out.println(e);
+			System.exit(0);
+		}
+	}
+
+	public void writeChar(char value) {
+		try {
+      file.writeChar(value);
 		} catch (Exception e) {
 			System.out.println(e);
 			System.exit(0);
