@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class HuffmanEncoder {
   public void compress(FileManager data, String newFilename) {
     ArrayList<Node> frequency = getFrequencyArray(data);
-    // Node root = getHuffmanTree(frequency);
+    Node root = getHuffmanTree(frequency);
     // ArrayList<CharCodeMap> charCodeMap = buildCharCodeMap(root);
 
     // CompressResult compressedData = getCompressedData(data, charCodeMap, root);
@@ -74,7 +74,7 @@ public class HuffmanEncoder {
 
       if (frequency.size() == 0) {
         byteControl.add(b);
-        frequency.add(new Node((byte) 1, b));
+        frequency.add(new Node(1, b));
         isEndOfFile = data.gotToEndOfFile();
         continue;
       }
@@ -87,7 +87,7 @@ public class HuffmanEncoder {
       }
 
       byteControl.add(b);
-      frequency.add(new Node((byte) 1, b));
+      frequency.add(new Node(1, b));
 
       isEndOfFile = data.gotToEndOfFile();
     }
@@ -95,24 +95,24 @@ public class HuffmanEncoder {
     return frequency;
   }
 
-  public static Node getHuffmanTree(byte[] frequency) {
+  public static Node getHuffmanTree(ArrayList<Node> frequency) {
     Priority<Node> queue = new Priority<>();
 
-    for (byte i = 0; i < 256; i++) {
-      if (frequency[i] > 0) {
-        queue.add(new Node(frequency[i], i));
+    for (Node node : frequency) {
+      if (node.getFrequency() > 0) {
+        queue.add(new Node(node.getFrequency(), node.getByte()));
       }
     }
 
     if (queue.size() == 1) {
-      queue.add(new Node((byte) 1, (byte) 0, null, null));
+      queue.add(new Node(1, (byte) 0, null, null));
     }
 
     while (queue.size() > 1) {
       Node left = queue.poll();
       Node right = queue.poll();
 
-      Node newNode = new Node((byte) (left.getFrequency() + right.getFrequency()), (byte) 0, left, right);
+      Node newNode = new Node((left.getFrequency() + right.getFrequency()), null, left, right);
 
       queue.add(newNode);
     }
@@ -173,17 +173,17 @@ public class HuffmanEncoder {
   //   return ret;
   // }
 
-  private void compressCodeMap(ArrayList<CharCodeMap> codeMap, FileManager file, int endUsefulBits) {
-    for (int i = 0; i < codeMap.size(); i++) {
-      CharCodeMap cm = codeMap.get(i);
-      file.writeByte(cm.byt);
-      file.writeByte(cm.frequency);
-      file.writeByte((byte) 0);
-    }
+  // private void compressCodeMap(ArrayList<CharCodeMap> codeMap, FileManager file, int endUsefulBits) {
+  //   for (int i = 0; i < codeMap.size(); i++) {
+  //     CharCodeMap cm = codeMap.get(i);
+  //     file.writeByte(cm.byt);
+  //     file.writeByte((byte) cm.frequency);
+  //     file.writeByte((byte) 0);
+  //   }
 
-    file.writeByte((byte) endUsefulBits);
-    file.writeByte((byte) 0);
-  }
+  //   file.writeByte((byte) endUsefulBits);
+  //   file.writeByte((byte) 0);
+  // }
 
   // private void decompressMap(FileManager data, Node root) {
   //   Node node = root;

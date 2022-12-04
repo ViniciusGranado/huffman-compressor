@@ -1,6 +1,6 @@
 package shared;
 public class Node implements Comparable<Node> {
-  private Byte frequency;
+  private Integer frequency;
   private Byte byt;
   private Node left;
   private Node right;
@@ -12,40 +12,40 @@ public class Node implements Comparable<Node> {
     this.right = null;
   }
 
-  public Node (byte byt) {
+  public Node (Byte byt) {
     this.frequency = null;
     this.byt = byt;
     this.left = null;
     this.right = null;
   }
 
-  public Node (byte frequency, byte byt) {
+  public Node (Integer frequency, Byte byt) {
     this.frequency = frequency;
     this.byt = byt;
     this.left = null;
     this.right = null;
   }
 
-  public Node (byte frequency, byte byt, Node left, Node right) {
+  public Node (Integer frequency, Byte byt, Node left, Node right) {
     this.frequency = frequency;
     this.byt = byt;
     this.left = left;
     this.right = right;
   }
 
-  public byte getFrequency() {
+  public Integer getFrequency() {
     return frequency;
   }
 
-  public void setFrequency(byte frequency) {
+  public void setFrequency(Integer frequency) {
     this.frequency = frequency;
   }
 
-  public byte getByte() {
+  public Byte getByte() {
     return byt;
   }
 
-  public void setByte(byte byt) {
+  public void setByte(Byte byt) {
     this.byt = byt;
   }
 
