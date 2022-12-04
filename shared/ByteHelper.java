@@ -4,7 +4,7 @@ public class ByteHelper {
   public static byte stringToByte(String str) {
     byte ret = (byte) 0;
 
-    for (byte stringPosition = (byte) 0, bytePosition = (byte) 0; bytePosition < 8; stringPosition--, bytePosition++) {
+    for (byte stringPosition = (byte) 7, bytePosition = (byte) 0; bytePosition < 8; stringPosition--, bytePosition++) {
       if (str.charAt(stringPosition) == '1') {
         ret = setBit(bytePosition, ret);
       }

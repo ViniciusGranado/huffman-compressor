@@ -41,6 +41,15 @@ public class FileManager {
 		}
 	}
 
+	public void writeInt(int value) {
+		try {
+      file.writeInt(value);
+		} catch (Exception e) {
+			System.out.println(e);
+			System.exit(0);
+		}
+	}
+
   public Boolean gotToEndOfFile() {
     try {
       return position == file.length();

@@ -7,22 +7,22 @@ public class HuffmanEncoder {
   public void compress(FileManager data, String newFilename) {
     ArrayList<Node> frequency = getFrequencyArray(data);
     Node root = getHuffmanTree(frequency);
-    // ArrayList<CharCodeMap> charCodeMap = buildCharCodeMap(root);
+    ArrayList<CharCodeMap> charCodeMap = buildCharCodeMap(root);
 
-    // CompressResult compressedData = getCompressedData(data, charCodeMap, root);
+    CompressResult compressedData = getCompressedData(data, charCodeMap, root);
 
-    // FileManager compressedFile = null;
+    FileManager compressedFile = null;
 
-    // try {
-    //   compressedFile = new FileManager(newFilename + ".edd", "w");
-    // } catch (Exception e) {
-    //   System.out.println(e);
-    //   System.exit(0);
-    // }
+    try {
+      compressedFile = new FileManager(newFilename + ".edd", "rw");
+    } catch (Exception e) {
+      System.out.println(e);
+      System.exit(0);
+    }
 
-    // String newFileContent = compressedData.getCompressedData();
-    // compressCodeMap(charCodeMap, compressedFile, newFileContent.length() % 8);
-    // compressedFile.generateCompressedFile(newFileContent);
+    String newFileContent = compressedData.getCompressedData();
+    compressCodeMap(charCodeMap, compressedFile, newFileContent.length() % 8);
+    compressedFile.generateCompressedFile(newFileContent);
   }
 
   // public void decompress(FileManager data, String newFilename) {
@@ -173,17 +173,17 @@ public class HuffmanEncoder {
   //   return ret;
   // }
 
-  // private void compressCodeMap(ArrayList<CharCodeMap> codeMap, FileManager file, int endUsefulBits) {
-  //   for (int i = 0; i < codeMap.size(); i++) {
-  //     CharCodeMap cm = codeMap.get(i);
-  //     file.writeByte(cm.byt);
-  //     file.writeByte((byte) cm.frequency);
-  //     file.writeByte((byte) 0);
-  //   }
+  private void compressCodeMap(ArrayList<CharCodeMap> codeMap, FileManager file, int endUsefulBits) {
+    for (int i = 0; i < codeMap.size(); i++) {
+      CharCodeMap cm = codeMap.get(i);
+      file.writeByte(cm.byt);
+      file.writeInt(cm.frequency);
+      file.writeByte((byte) 0);
+    }
 
-  //   file.writeByte((byte) endUsefulBits);
-  //   file.writeByte((byte) 0);
-  // }
+    file.writeByte((byte) endUsefulBits);
+    file.writeByte((byte) 0);
+  }
 
   // private void decompressMap(FileManager data, Node root) {
   //   Node node = root;
