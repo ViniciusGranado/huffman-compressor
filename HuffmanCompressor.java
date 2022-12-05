@@ -2,10 +2,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.security.InvalidParameterException;
 
-import shared.FileManager;
-import shared.HuffmanEncoder;
-import shared.Menu;
-
 public class HuffmanCompressor {
   public static void main(String[] args) {
     Menu.printMainMenu();
@@ -18,7 +14,7 @@ public class HuffmanCompressor {
       Menu.printOptionLabel();
 
       try {
-        userOption = reader.readLine(); 
+        userOption = reader.readLine();
 
         int option = Integer.parseInt(userOption);
 

@@ -1,6 +1,3 @@
-package shared;
-
-import java.util.Map;
 
 public class HuffmanTree {
   Node root;

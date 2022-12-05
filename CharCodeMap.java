@@ -1,5 +1,3 @@
-package shared;
-
 public class CharCodeMap {
   public Byte byt;
   public Integer frequency;

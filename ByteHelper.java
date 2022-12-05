@@ -1,4 +1,4 @@
-package shared;
+
 
 public class ByteHelper {
   public static byte stringToByte(String str) {
