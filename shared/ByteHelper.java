@@ -36,6 +36,10 @@ public class ByteHelper {
     byte mascara = (byte) 1;
     mascara <<= bitPos;
 
+    if (bitPos == 7) {
+      return (value &= mascara) == -128;
+    }
+
     return (value &= mascara) > 0;
   }
 }

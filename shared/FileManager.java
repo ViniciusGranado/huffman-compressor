@@ -1,16 +1,20 @@
 package shared;
 
+import java.io.EOFException;
 import java.io.RandomAccessFile;
 
 public class FileManager {
   private RandomAccessFile file;
   private long position;
+	private int totalBits;
+	private int bitsRead;
 	private byte[] bytesArr;
 
   public FileManager(String filename, String mode) throws Exception {
     file = new RandomAccessFile(filename, mode); 
 		bytesArr = new byte[(int) file.length()];
 		file.read(bytesArr);
+		file.seek(0);
   }
 
 	public RandomAccessFile getFile() {
@@ -25,12 +29,22 @@ public class FileManager {
 		return bytesArr;
 	}
 
-  public byte readByte() {
+	public int getTotalBits() {
+		return totalBits;
+	}
+
+	public void setTotalBits(int totalBits) {
+		this.totalBits = totalBits;
+	}
+
+  public byte readByte() throws Exception{
 		byte byt = 0;
 
 		try {
       byt = file.readByte();
 			position++;
+		} catch(EOFException e) {
+			throw new EOFException("Got to the end of the file");
 		} catch (Exception e) {
 			System.out.println(e);
 			System.exit(0);

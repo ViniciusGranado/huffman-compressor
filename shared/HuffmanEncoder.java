@@ -1,15 +1,20 @@
 package shared;
 
-import java.util.ArrayList;
+import java.io.EOFException;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HuffmanEncoder {
+  Map<Byte, String> charCodeMap2;
+  Node root;
+
   public void compress(FileManager data, String newFilename) {
     Map<Byte, Integer> frequency = getFrequencyMap(data.getBytesArr());
     Priority<Node> priorityQueue = getPriorityQueue(frequency);
     HuffmanTree tree = new HuffmanTree(priorityQueue);
     Map<Byte, String> charCodeMap = buildCharCodeMap(tree.getRoot());
+    charCodeMap2 = buildCharCodeMap(tree.getRoot());
 
     CompressResult compressedData = getCompressedData(data, charCodeMap, tree.getRoot());
 
@@ -28,49 +33,55 @@ public class HuffmanEncoder {
   }
 
   public void decompress(FileManager data, String newFilename) {
-    Node root = new Node();
-    byte endUsefulBits = 0;
-    
+    Byte endUsefulBits = null;
     try {
-      endUsefulBits = decompressMap(data, root);
+      endUsefulBits = data.readByte();
     } catch(Exception e) {
       System.out.println(e);
       System.exit(0);
     }
+    
+    decompressTree(data);
+    Map<Byte, String> charCodeMap = buildCharCodeMap(root);
 
-    // String compressedData = getCompressedData(data);
-    // String decompressedString = "";
-    // Node node = root;
+    FileManager newFile = null;
 
-    // FileManager decompressedFile = null;
+    try {
+      newFile = new FileManager(newFilename, "rw");
+    } catch (Exception e) {
+      System.out.println(e);
+    }
 
-    // try {
-    //   decompressedFile = new FileManager(newFilename, "w");
-    // } catch (Exception e) {
-    //   System.out.println(e);
-    //   System.exit(0);
-    // }
+    String compressedData = "";
+    while (true) {
+      Byte b = null;
+      try {
+        b = data.readByte();
+      } catch(EOFException e) {
+        break;
+      } catch(Exception e) {
+        System.out.println(e);
+        System.exit(0);
+      }
 
-    // for (int i = 0; i < compressedData.length();) {
-    //   while (!node.isLeaf()) {
-    //     char character = compressedData.charAt(i);
+      compressedData += ByteHelper.byteToString(b);
+    }
 
-    //     if (character == '0') {
-    //       node = node.getLeft();
-    //     } else {
-    //       node = node.getRight();
-    //     }
+    Node node = root;
 
-    //     i++;
-    //   }
-
-    //   decompressedFile.writeByte(node.getByte());
-    //   node = root;
-    // }
-
-    // for (char c : decompressedString.toCharArray()) {
-    //   decompressedFile.writeChar(c);
-    // }
+    for (int i = 0; i < compressedData.length() - endUsefulBits; i++) {
+      if (node.getLeft() == null && node.getRight() == null) {
+        newFile.writeByte(node.getByte());
+        node = root;
+        i--;
+      } else {
+        if (compressedData.charAt(i) == '1') {
+          node = node.getRight();
+        } else {
+          node = node.getLeft();
+        }
+      }
+    }
   }
 
   public static Map<Byte, Integer> getFrequencyMap(byte[] byteArr) {
@@ -144,22 +155,11 @@ public class HuffmanEncoder {
   // }
 
   private void generateCompressedFile(HuffmanTree tree, String newFileContent, FileManager newFile) {
-    int endUsefulBits = newFileContent.length() % 8;
+    int endUsefulBits = 8 - (newFileContent.length() % 8);
 
     newFile.writeByte((byte) endUsefulBits);
 
-    StringBuilder stringTree = new StringBuilder();
-    treeToString(tree.getRoot(), stringTree);
-
-		for (char c : stringTree.toString().toCharArray()) {
-			if (c == '0') {
-				newFile.writeByte((byte) 0);
-			} else if (c == '1') {
-				newFile.writeByte((byte) 1);
-			} else {
-				newFile.writeChar(c);
-			}
-		}
+    compressTree(tree.getRoot(), newFile);
 
     StringBuilder newFileContentSb = new StringBuilder(newFileContent);
     
@@ -180,51 +180,60 @@ public class HuffmanEncoder {
     }
   }
 
-  private void treeToString(Node root, StringBuilder stringTree) {
+  private void compressTree(Node root, FileManager newFile) {
 		if (root != null) {
 			if (root.getLeft() == null && root.getRight() == null) {
-				stringTree.append(0);
-				stringTree.append(root.getByte());
+				newFile.writeByte((byte) 0);
+				newFile.writeByte(root.getByte());
 			} else {
-				stringTree.append(1);
+				newFile.writeByte((byte) 1);
 			}
-			treeToString(root.getLeft(), stringTree);
-			treeToString(root.getRight(), stringTree);
+			compressTree(root.getLeft(), newFile);
+			compressTree(root.getRight(), newFile);
 		}
   }
 
-  private byte decompressMap(FileManager data, Node root) throws Exception {
-    ArrayList<Node> frequencyArr = new ArrayList<>();
-
-    while (true) {
-      Byte byt = data.readByte();
-      int frequency = data.readInt();
-
-      frequencyArr.add(new Node(frequency, byt));
-
-      char c = data.readCharWithoutChanginPosition();
-
-      if (c == (char) 0) {
-        data.readChar();
-        break;
+  public void decompressTree(FileManager compressedFile) {
+    try {
+      byte b = compressedFile.readByte();
+      if (b == (byte) 1) {
+        root = new Node();
       }
+  
+      decompressTree(compressedFile, root);
+    } catch(Exception e) {
+      System.out.println(e);
+      System.exit(0);
+    } 
+	}
+
+  private void decompressTree(FileManager data, Node root){
+    try {
+      if (!data.gotToEndOfFile()) {
+        Byte byt = data.readByte();
+  
+        if (byt == (byte) 1) {
+          root.setLeft(new Node());
+          decompressTree(data, root.getLeft());
+        } else {
+          byte b = data.readByte();
+          root.setLeft(new Node(b));
+        }
+  
+        byt = data.readByte();
+        // 1 = internal node
+        if (byt == (byte) 1) {
+          root.setRight(new Node());
+          decompressTree(data, root.getRight());
+        } else {
+          byte b = data.readByte();
+          root.setRight(new Node(b));
+        }
+      }
+    } catch (Exception e) {
+      System.out.println(e);
+      System.exit(0);
     }
-
-    char c = data.readChar();
-
-    if (c != (char) 0) {
-      throw new Exception("Arquivo compactado incorretamente");
-    }
-
-    byte endUsefulBits = data.readByte();
-
-    c = data.readChar();
-
-    if (c != (char) 0) {
-      throw new Exception("Arquivo compactado incorretamente");
-    }
-
-    return endUsefulBits;
   }
 
   static class CompressResult {
