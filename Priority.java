@@ -1,8 +1,7 @@
-
-
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class Priority<T extends Comparable<T>> {
+public class Priority<T extends Comparable<T> & Cloneable> {
   ArrayList<T> values;
   int len;
 
@@ -45,6 +44,7 @@ public class Priority<T extends Comparable<T>> {
     return values.remove(0);
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
 
@@ -53,5 +53,17 @@ public class Priority<T extends Comparable<T>> {
     }
 
     return sb.toString();
+  }
+
+  public boolean equals(Object object) {
+    if (this == object) return true;
+    if (object == null || getClass() != object.getClass()) return false;
+    if (!super.equals(object)) return false;
+    Priority<?> priority = (Priority<?>) object;
+    return len == priority.len && java.util.Objects.equals(values, priority.values);
+  }
+
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), values, len);
   }
 }

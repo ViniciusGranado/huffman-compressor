@@ -1,5 +1,6 @@
+import java.util.Objects;
 
-public class HuffmanTree {
+public class HuffmanTree implements Cloneable {
   Node root;
 
   public HuffmanTree(Priority<Node> queue) {
@@ -19,11 +20,42 @@ public class HuffmanTree {
     root = queue.poll();
   }
 
+  public HuffmanTree(Node root) {
+    this.root = root;
+  }
+
   public Node getRoot() {
     return root;
   }
 
   public void setRoot(Node root) {
     this.root = root;
+  }
+
+  @java.lang.Override
+  public java.lang.String toString() {
+    return "HuffmanTree{" +
+            "root=" + root +
+            '}';
+  }
+
+  public HuffmanTree clone() {
+    Node node = new Node();
+
+    node = root.clone();
+
+    return new HuffmanTree(node);
+  }
+
+  public boolean equals(Object object) {
+    if (this == object) return true;
+    if (object == null || getClass() != object.getClass()) return false;
+    if (!super.equals(object)) return false;
+    HuffmanTree that = (HuffmanTree) object;
+    return java.util.Objects.equals(root, that.root);
+  }
+
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), root);
   }
 }
