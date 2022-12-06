@@ -95,7 +95,7 @@ public class Decompressor {
     Node node = root;
 
     for (int i = 0; i < compressedData.length() - endUsefulBits; i++) {
-      if (node.getLeft() == null && node.getRight() == null) {
+      if (node.isLeaf()) {
         newFile.writeByte(node.getByte());
         node = root;
         i--;

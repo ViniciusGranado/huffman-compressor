@@ -11,7 +11,7 @@ public class Priority<T extends Comparable<T> & Cloneable> {
   }
 
   public int size() {
-  return len;
+    return len;
   }
 
   public void add(T object) {

@@ -107,7 +107,7 @@ public class Compressor {
 
   private static void compressTree(Node root, FileManager newFile) {
 		if (root != null) {
-			if (root.getLeft() == null && root.getRight() == null) {
+			if (root.isLeaf()) {
 				newFile.writeByte((byte) 0);
 				newFile.writeByte(root.getByte());
 			} else {

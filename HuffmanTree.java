@@ -5,7 +5,7 @@ public class HuffmanTree implements Cloneable {
 
   public HuffmanTree(Priority<Node> queue) {
     if (queue.size() == 1) {
-      queue.add(new Node(1, (byte) 0, null, null));
+      queue.add(new Node(1, queue.poll().getByte(), null, null));
     }
 
     while (queue.size() > 1) {
@@ -32,7 +32,7 @@ public class HuffmanTree implements Cloneable {
     this.root = root;
   }
 
-  @java.lang.Override
+  @Override
   public java.lang.String toString() {
     return "HuffmanTree{" +
             "root=" + root +

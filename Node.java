@@ -70,10 +70,6 @@ public class Node implements Comparable<Node>, Cloneable {
     return (left == null && right == null);
   }
 
-  public void addFrequency() {
-    frequency++;
-  }
-
   @Override
   public int compareTo(Node comparedNode) {
     return this.frequency - comparedNode.frequency;
